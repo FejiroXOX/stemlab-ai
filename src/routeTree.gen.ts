@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TutorRouteImport } from './routes/tutor'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExperimentsProjectileRouteImport } from './routes/experiments.projectile'
 import { Route as ExperimentsCircuitRouteImport } from './routes/experiments.circuit'
 import { Route as ExperimentsChemistryRouteImport } from './routes/experiments.chemistry'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
+const TutorRoute = TutorRouteImport.update({
+  id: '/tutor',
+  path: '/tutor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +49,7 @@ const ApiChatRoute = ApiChatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/tutor': typeof TutorRoute
   '/api/chat': typeof ApiChatRoute
   '/experiments/chemistry': typeof ExperimentsChemistryRoute
   '/experiments/circuit': typeof ExperimentsCircuitRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/tutor': typeof TutorRoute
   '/api/chat': typeof ApiChatRoute
   '/experiments/chemistry': typeof ExperimentsChemistryRoute
   '/experiments/circuit': typeof ExperimentsCircuitRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/tutor': typeof TutorRoute
   '/api/chat': typeof ApiChatRoute
   '/experiments/chemistry': typeof ExperimentsChemistryRoute
   '/experiments/circuit': typeof ExperimentsCircuitRoute
@@ -67,6 +76,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/tutor'
     | '/api/chat'
     | '/experiments/chemistry'
     | '/experiments/circuit'
@@ -74,6 +84,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/tutor'
     | '/api/chat'
     | '/experiments/chemistry'
     | '/experiments/circuit'
@@ -81,6 +92,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/tutor'
     | '/api/chat'
     | '/experiments/chemistry'
     | '/experiments/circuit'
@@ -89,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  TutorRoute: typeof TutorRoute
   ApiChatRoute: typeof ApiChatRoute
   ExperimentsChemistryRoute: typeof ExperimentsChemistryRoute
   ExperimentsCircuitRoute: typeof ExperimentsCircuitRoute
@@ -97,6 +110,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tutor': {
+      id: '/tutor'
+      path: '/tutor'
+      fullPath: '/tutor'
+      preLoaderRoute: typeof TutorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -137,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  TutorRoute: TutorRoute,
   ApiChatRoute: ApiChatRoute,
   ExperimentsChemistryRoute: ExperimentsChemistryRoute,
   ExperimentsCircuitRoute: ExperimentsCircuitRoute,
