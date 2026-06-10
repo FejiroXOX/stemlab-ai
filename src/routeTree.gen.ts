@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TutorRouteImport } from './routes/tutor'
 import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExperimentsProjectileRouteImport } from './routes/experiments.projectile'
 import { Route as ExperimentsCircuitRouteImport } from './routes/experiments.circuit'
@@ -25,6 +26,11 @@ const TutorRoute = TutorRouteImport.update({
 const QuizRoute = QuizRouteImport.update({
   id: '/quiz',
   path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgressRoute = ProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -55,6 +61,7 @@ const ApiChatRoute = ApiChatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/progress': typeof ProgressRoute
   '/quiz': typeof QuizRoute
   '/tutor': typeof TutorRoute
   '/api/chat': typeof ApiChatRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/progress': typeof ProgressRoute
   '/quiz': typeof QuizRoute
   '/tutor': typeof TutorRoute
   '/api/chat': typeof ApiChatRoute
@@ -74,6 +82,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/progress': typeof ProgressRoute
   '/quiz': typeof QuizRoute
   '/tutor': typeof TutorRoute
   '/api/chat': typeof ApiChatRoute
@@ -85,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/progress'
     | '/quiz'
     | '/tutor'
     | '/api/chat'
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/progress'
     | '/quiz'
     | '/tutor'
     | '/api/chat'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/progress'
     | '/quiz'
     | '/tutor'
     | '/api/chat'
@@ -113,6 +125,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProgressRoute: typeof ProgressRoute
   QuizRoute: typeof QuizRoute
   TutorRoute: typeof TutorRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/quiz'
       fullPath: '/quiz'
       preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/progress': {
+      id: '/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof ProgressRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -177,6 +197,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProgressRoute: ProgressRoute,
   QuizRoute: QuizRoute,
   TutorRoute: TutorRoute,
   ApiChatRoute: ApiChatRoute,
