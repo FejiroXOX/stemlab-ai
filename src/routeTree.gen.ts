@@ -9,38 +9,154 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TutorRouteImport } from './routes/tutor'
+import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExperimentsProjectileRouteImport } from './routes/experiments.projectile'
+import { Route as ExperimentsCircuitRouteImport } from './routes/experiments.circuit'
+import { Route as ExperimentsChemistryRouteImport } from './routes/experiments.chemistry'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 
+const TutorRoute = TutorRouteImport.update({
+  id: '/tutor',
+  path: '/tutor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgressRoute = ProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExperimentsProjectileRoute = ExperimentsProjectileRouteImport.update({
+  id: '/experiments/projectile',
+  path: '/experiments/projectile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperimentsCircuitRoute = ExperimentsCircuitRouteImport.update({
+  id: '/experiments/circuit',
+  path: '/experiments/circuit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperimentsChemistryRoute = ExperimentsChemistryRouteImport.update({
+  id: '/experiments/chemistry',
+  path: '/experiments/chemistry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/progress': typeof ProgressRoute
+  '/quiz': typeof QuizRoute
+  '/tutor': typeof TutorRoute
+  '/api/chat': typeof ApiChatRoute
+  '/experiments/chemistry': typeof ExperimentsChemistryRoute
+  '/experiments/circuit': typeof ExperimentsCircuitRoute
+  '/experiments/projectile': typeof ExperimentsProjectileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/progress': typeof ProgressRoute
+  '/quiz': typeof QuizRoute
+  '/tutor': typeof TutorRoute
+  '/api/chat': typeof ApiChatRoute
+  '/experiments/chemistry': typeof ExperimentsChemistryRoute
+  '/experiments/circuit': typeof ExperimentsCircuitRoute
+  '/experiments/projectile': typeof ExperimentsProjectileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/progress': typeof ProgressRoute
+  '/quiz': typeof QuizRoute
+  '/tutor': typeof TutorRoute
+  '/api/chat': typeof ApiChatRoute
+  '/experiments/chemistry': typeof ExperimentsChemistryRoute
+  '/experiments/circuit': typeof ExperimentsCircuitRoute
+  '/experiments/projectile': typeof ExperimentsProjectileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/progress'
+    | '/quiz'
+    | '/tutor'
+    | '/api/chat'
+    | '/experiments/chemistry'
+    | '/experiments/circuit'
+    | '/experiments/projectile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/progress'
+    | '/quiz'
+    | '/tutor'
+    | '/api/chat'
+    | '/experiments/chemistry'
+    | '/experiments/circuit'
+    | '/experiments/projectile'
+  id:
+    | '__root__'
+    | '/'
+    | '/progress'
+    | '/quiz'
+    | '/tutor'
+    | '/api/chat'
+    | '/experiments/chemistry'
+    | '/experiments/circuit'
+    | '/experiments/projectile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProgressRoute: typeof ProgressRoute
+  QuizRoute: typeof QuizRoute
+  TutorRoute: typeof TutorRoute
+  ApiChatRoute: typeof ApiChatRoute
+  ExperimentsChemistryRoute: typeof ExperimentsChemistryRoute
+  ExperimentsCircuitRoute: typeof ExperimentsCircuitRoute
+  ExperimentsProjectileRoute: typeof ExperimentsProjectileRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tutor': {
+      id: '/tutor'
+      path: '/tutor'
+      fullPath: '/tutor'
+      preLoaderRoute: typeof TutorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/progress': {
+      id: '/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof ProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +164,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/experiments/projectile': {
+      id: '/experiments/projectile'
+      path: '/experiments/projectile'
+      fullPath: '/experiments/projectile'
+      preLoaderRoute: typeof ExperimentsProjectileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiments/circuit': {
+      id: '/experiments/circuit'
+      path: '/experiments/circuit'
+      fullPath: '/experiments/circuit'
+      preLoaderRoute: typeof ExperimentsCircuitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiments/chemistry': {
+      id: '/experiments/chemistry'
+      path: '/experiments/chemistry'
+      fullPath: '/experiments/chemistry'
+      preLoaderRoute: typeof ExperimentsChemistryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProgressRoute: ProgressRoute,
+  QuizRoute: QuizRoute,
+  TutorRoute: TutorRoute,
+  ApiChatRoute: ApiChatRoute,
+  ExperimentsChemistryRoute: ExperimentsChemistryRoute,
+  ExperimentsCircuitRoute: ExperimentsCircuitRoute,
+  ExperimentsProjectileRoute: ExperimentsProjectileRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
