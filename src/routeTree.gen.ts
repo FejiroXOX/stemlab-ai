@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExperimentsCircuitRouteImport } from './routes/experiments.circuit'
 import { Route as ExperimentsChemistryRouteImport } from './routes/experiments.chemistry'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperimentsCircuitRoute = ExperimentsCircuitRouteImport.update({
+  id: '/experiments/circuit',
+  path: '/experiments/circuit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExperimentsChemistryRoute = ExperimentsChemistryRouteImport.update({
@@ -33,30 +39,43 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/chat': typeof ApiChatRoute
   '/experiments/chemistry': typeof ExperimentsChemistryRoute
+  '/experiments/circuit': typeof ExperimentsCircuitRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/chat': typeof ApiChatRoute
   '/experiments/chemistry': typeof ExperimentsChemistryRoute
+  '/experiments/circuit': typeof ExperimentsCircuitRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/chat': typeof ApiChatRoute
   '/experiments/chemistry': typeof ExperimentsChemistryRoute
+  '/experiments/circuit': typeof ExperimentsCircuitRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/chat' | '/experiments/chemistry'
+  fullPaths:
+    | '/'
+    | '/api/chat'
+    | '/experiments/chemistry'
+    | '/experiments/circuit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/chat' | '/experiments/chemistry'
-  id: '__root__' | '/' | '/api/chat' | '/experiments/chemistry'
+  to: '/' | '/api/chat' | '/experiments/chemistry' | '/experiments/circuit'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/chat'
+    | '/experiments/chemistry'
+    | '/experiments/circuit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiChatRoute: typeof ApiChatRoute
   ExperimentsChemistryRoute: typeof ExperimentsChemistryRoute
+  ExperimentsCircuitRoute: typeof ExperimentsCircuitRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -66,6 +85,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiments/circuit': {
+      id: '/experiments/circuit'
+      path: '/experiments/circuit'
+      fullPath: '/experiments/circuit'
+      preLoaderRoute: typeof ExperimentsCircuitRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/experiments/chemistry': {
@@ -89,6 +115,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiChatRoute: ApiChatRoute,
   ExperimentsChemistryRoute: ExperimentsChemistryRoute,
+  ExperimentsCircuitRoute: ExperimentsCircuitRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
