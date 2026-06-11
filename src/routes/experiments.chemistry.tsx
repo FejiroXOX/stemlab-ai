@@ -216,9 +216,10 @@ function ChemistryLab() {
             </div>
           ) : mixed !== null ? (
             <div className="glass rounded-2xl p-5 text-sm text-muted-foreground">
-              No notable reaction — try a known combination like <b>Vinegar + Baking Soda</b>, <b>HCl + NaOH</b>, or <b>CuSO₄ + Iron</b>.
+              No notable reaction with this pair. Try <b>Vinegar + Baking Soda</b>, <b>HCl + NaOH</b>, <b>CuSO₄ + NaOH</b>, <b>HCl + Iron</b>, or <b>HCl + Water</b>.
             </div>
           ) : null}
+
 
           {mixed && reaction && (
             <ExplainWhatHappened
