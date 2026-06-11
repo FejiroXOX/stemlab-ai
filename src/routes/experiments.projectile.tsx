@@ -128,11 +128,12 @@ function ProjectileLab() {
                 <line x1={sx(physics.range / 2)} y1={sy(physics.maxH)} x2={sx(physics.range / 2)} y2={H - padY} stroke="oklch(0.72 0.2 280 / 0.4)" strokeDasharray="2 4" />
                 {/* ball */}
                 <circle cx={cx} cy={cy} r="9" fill="oklch(0.78 0.18 70)" stroke="oklch(0.5 0.1 60)" />
-                {/* launch arrow */}
-                <g transform={`translate(${padX}, ${H - padY}) rotate(${-angle})`}>
-                  <line x1="0" y1="0" x2="40" y2="0" stroke="oklch(0.72 0.2 280)" strokeWidth="3" />
-                  <polygon points="40,-5 50,0 40,5" fill="oklch(0.72 0.2 280)" />
+                {/* launch arrow — rotated by true angle from origin */}
+                <g transform={`translate(${originX}, ${originY}) rotate(${-angle})`}>
+                  <line x1="0" y1="0" x2={arrowLen} y2="0" stroke="oklch(0.72 0.2 280)" strokeWidth="3" />
+                  <polygon points={`${arrowLen},-6 ${arrowLen + 10},0 ${arrowLen},6`} fill="oklch(0.72 0.2 280)" />
                 </g>
+
                 {/* labels */}
                 <text x={W - padX - 8} y={H - padY - 6} textAnchor="end" fontSize="11" fill="oklch(0.6 0.02 260)">Range: {physics.range.toFixed(1)} m</text>
                 <text x={padX + 6} y={padY + 12} fontSize="11" fill="oklch(0.6 0.02 260)">Peak: {physics.maxH.toFixed(1)} m</text>
