@@ -174,20 +174,23 @@ function ChemistryLab() {
             </div>
 
             {/* Visualization */}
-            <div className="relative mt-6 h-64 overflow-hidden rounded-2xl border border-border/60 bg-background/30">
-              <div className="absolute inset-0 grid grid-cols-3 items-end gap-6 px-8 pb-6">
+            <div className="relative mt-6 h-72 overflow-hidden rounded-2xl border border-border/60" style={{ background: "linear-gradient(180deg, oklch(0.25 0.03 250 / 0.4), oklch(0.15 0.02 250 / 0.6))" }}>
+              {/* lab bench */}
+              <div className="absolute inset-x-0 bottom-0 h-10" style={{ background: "linear-gradient(180deg, oklch(0.3 0.02 60 / 0.6), oklch(0.2 0.02 60 / 0.9))" }} />
+              <div className="absolute inset-0 grid grid-cols-3 items-end gap-4 px-6 pb-10">
                 <Flask color={reagentA.color} label={a} />
                 <div className="grid h-full place-items-center">
                   {mixed && (
                     <div className="text-center">
                       <FlaskConical className="mx-auto h-10 w-10 animate-float text-primary" />
-                      <div className="mt-2 text-xs uppercase tracking-widest text-muted-foreground">Mixing…</div>
+                      <div className="mt-2 text-xs uppercase tracking-widest text-muted-foreground">Reacting…</div>
                     </div>
                   )}
                 </div>
                 <Flask color={reagentB.color} label={b} effect={reaction?.effect} resultColor={reaction?.resultColor} />
               </div>
             </div>
+
 
             <div className="mt-5 flex flex-wrap gap-3">
               <Button onClick={mix} size="lg" className="glow">
