@@ -16,6 +16,7 @@ import {
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/lib/theme";
+import { useProgress } from "@/lib/progress-store";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -31,6 +32,7 @@ const NAV = [
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { theme, toggle } = useTheme();
+  const { progress } = useProgress();
   const [open, setOpen] = useState(false);
 
   return (
@@ -83,7 +85,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Trophy className="h-3.5 w-3.5 text-[color:var(--engineering)]" />
             Today's streak
           </div>
-          <div className="mt-1 text-xl font-bold gradient-text">🔥 4 days</div>
+          <div className="mt-1 text-xl font-bold gradient-text">🔥 {progress.streak} days</div>
         </div>
       </aside>
 

@@ -85,11 +85,23 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function ScrollToTop() {
+  const router = useRouter();
+  useEffect(() => {
+    const unsub = router.subscribe("onResolved", () => {
+      if (typeof window !== "undefined") window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
+    });
+    return unsub;
+  }, [router]);
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
+        <ScrollToTop />
         <Outlet />
       </ThemeProvider>
     </QueryClientProvider>
