@@ -1,12 +1,43 @@
 import { createServerFn } from "@tanstack/react-start";
-import { generateText, Output } from "ai";
+import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+
+const MODEL = "google/gemini-3-flash-preview";
+
+function extractJson(text: string): unknown {
+  // Strip code fences
+  const cleaned = text
+    .replace(/^\s*```(?:json)?\s*/i, "")
+    .replace(/\s*```\s*$/i, "")
+    .trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    // Find first { ... last }
+    const first = cleaned.indexOf("{");
+    const last = cleaned.lastIndexOf("}");
+    if (first >= 0 && last > first) {
+      return JSON.parse(cleaned.slice(first, last + 1));
+    }
+    throw new Error("AI returned non-JSON response");
+  }
+}
 
 const ExplainInput = z.object({
   experiment: z.string(),
   setup: z.string(),
   result: z.string(),
+});
+
+const ExplainOutput = z.object({
+  headline: z.string(),
+  whatHappened: z.string(),
+  whyItHappened: z.string(),
+  keyConcepts: z.array(z.string()),
+  realWorld: z.string(),
+  funFact: z.string(),
+  difficulty: z.enum(["Beginner", "Intermediate", "Advanced"]),
 });
 
 export const explainExperiment = createServerFn({ method: "POST" })
@@ -16,33 +47,45 @@ export const explainExperiment = createServerFn({ method: "POST" })
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
     const gateway = createLovableAiGatewayProvider(key);
 
-    const { output } = await generateText({
-      model: gateway("google/gemini-3-flash-preview"),
-      output: Output.object({
-        schema: z.object({
-          headline: z.string(),
-          whatHappened: z.string(),
-          whyItHappened: z.string(),
-          keyConcepts: z.array(z.string()),
-          realWorld: z.string(),
-          funFact: z.string(),
-          difficulty: z.enum(["Beginner", "Intermediate", "Advanced"]),
-        }),
-      }),
-      prompt: `Explain this STEM experiment to a curious student.
+    const { text } = await generateText({
+      model: gateway(MODEL),
+      prompt: `You are STEMLab AI, explaining an experiment to a curious student.
 
 Experiment: ${data.experiment}
 Setup: ${data.setup}
 Result: ${data.result}
 
-Provide a vivid headline, a clear "what happened", a scientific "why", 3-5 key concepts, a real-world application, a fun fact, and a difficulty rating.`,
+Respond with ONLY a valid JSON object (no markdown, no code fences) matching this exact shape:
+{
+  "headline": "vivid one-line headline",
+  "whatHappened": "1-2 sentences describing observable result",
+  "whyItHappened": "2-3 sentences with the scientific reason",
+  "keyConcepts": ["concept1", "concept2", "concept3"],
+  "realWorld": "1-2 sentences on a real-world application",
+  "funFact": "one surprising fact",
+  "difficulty": "Beginner" | "Intermediate" | "Advanced"
+}`,
     });
-    return output;
+
+    return ExplainOutput.parse(extractJson(text));
   });
 
 const QuizInput = z.object({
-  topic: z.string(),
+  topic: z.string().min(1),
   count: z.number().int().min(3).max(8).default(5),
+});
+
+const QuizOutput = z.object({
+  title: z.string(),
+  questions: z.array(
+    z.object({
+      type: z.enum(["mcq", "tf", "short"]),
+      question: z.string(),
+      options: z.array(z.string()).optional(),
+      answer: z.string(),
+      explanation: z.string(),
+    }),
+  ),
 });
 
 export const generateQuiz = createServerFn({ method: "POST" })
@@ -52,23 +95,23 @@ export const generateQuiz = createServerFn({ method: "POST" })
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
     const gateway = createLovableAiGatewayProvider(key);
 
-    const { output } = await generateText({
-      model: gateway("google/gemini-3-flash-preview"),
-      output: Output.object({
-        schema: z.object({
-          title: z.string(),
-          questions: z.array(
-            z.object({
-              type: z.enum(["mcq", "tf", "short"]),
-              question: z.string(),
-              options: z.array(z.string()).optional(),
-              answer: z.string(),
-              explanation: z.string(),
-            }),
-          ),
-        }),
-      }),
-      prompt: `Generate a ${data.count}-question quiz on: ${data.topic}. Mix multiple-choice (4 options), true/false, and one short-answer question. Keep questions clear, age-appropriate for high schoolers, and include concise explanations.`,
+    const { text } = await generateText({
+      model: gateway(MODEL),
+      prompt: `Generate a ${data.count}-question high-school STEM quiz on the topic: "${data.topic}".
+Mix question types: multiple-choice (with 4 options), true/false, and at least one short-answer.
+For mcq: "answer" must exactly match one of "options". For tf: "answer" must be "True" or "False".
+Keep questions clear and concise; include a brief explanation for each.
+
+Respond with ONLY a valid JSON object (no markdown, no code fences) matching this exact shape:
+{
+  "title": "Quiz title about ${data.topic}",
+  "questions": [
+    { "type": "mcq", "question": "...", "options": ["A","B","C","D"], "answer": "A", "explanation": "..." },
+    { "type": "tf",  "question": "...", "answer": "True", "explanation": "..." },
+    { "type": "short", "question": "...", "answer": "...", "explanation": "..." }
+  ]
+}`,
     });
-    return output;
+
+    return QuizOutput.parse(extractJson(text));
   });
