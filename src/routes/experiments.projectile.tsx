@@ -60,12 +60,19 @@ function ProjectileLab() {
   const launch = () => { setT(0); setPlaying(true); };
   const reset = () => { setT(0); setPlaying(false); };
 
-  // Plot dims
-  const W = 760, H = 280, padX = 40, padY = 20;
-  const xMax = Math.max(physics.range, 10);
-  const yMax = Math.max(physics.maxH, 5);
-  const sx = (x: number) => padX + (x / xMax) * (W - padX * 2);
-  const sy = (y: number) => H - padY - (y / yMax) * (H - padY * 2);
+  // Plot dims — use a single uniform scale so the angle visually matches reality.
+  const W = 760, H = 320, padX = 44, padY = 24;
+  const plotW = W - padX * 2;
+  const plotH = H - padY * 2;
+  // World extent: include some headroom so trajectory always fits.
+  const worldX = Math.max(physics.range * 1.05, 10);
+  const worldY = Math.max(physics.maxH * 1.15, 5);
+  // Uniform scale (m -> px): the smaller of the two ratios so both fit.
+  const scale = Math.min(plotW / worldX, plotH / worldY);
+  const originX = padX;
+  const originY = H - padY;
+  const sx = (x: number) => originX + x * scale;
+  const sy = (y: number) => originY - y * scale;
 
   // Sample trajectory path
   const path = useMemo(() => {
@@ -79,11 +86,15 @@ function ProjectileLab() {
     }
     return `M ${pts.join(" L ")}`;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [physics, gravity]);
+  }, [physics, gravity, scale]);
 
   // Current ball position
   const cx = sx(physics.vx * t);
   const cy = sy(Math.max(0, physics.vy * t - 0.5 * gravity * t * t));
+
+  // Launch arrow length — fixed pixel length, rotated by true angle.
+  const arrowLen = 56;
+
 
   return (
     <AppShell>
@@ -117,11 +128,12 @@ function ProjectileLab() {
                 <line x1={sx(physics.range / 2)} y1={sy(physics.maxH)} x2={sx(physics.range / 2)} y2={H - padY} stroke="oklch(0.72 0.2 280 / 0.4)" strokeDasharray="2 4" />
                 {/* ball */}
                 <circle cx={cx} cy={cy} r="9" fill="oklch(0.78 0.18 70)" stroke="oklch(0.5 0.1 60)" />
-                {/* launch arrow */}
-                <g transform={`translate(${padX}, ${H - padY}) rotate(${-angle})`}>
-                  <line x1="0" y1="0" x2="40" y2="0" stroke="oklch(0.72 0.2 280)" strokeWidth="3" />
-                  <polygon points="40,-5 50,0 40,5" fill="oklch(0.72 0.2 280)" />
+                {/* launch arrow — rotated by true angle from origin */}
+                <g transform={`translate(${originX}, ${originY}) rotate(${-angle})`}>
+                  <line x1="0" y1="0" x2={arrowLen} y2="0" stroke="oklch(0.72 0.2 280)" strokeWidth="3" />
+                  <polygon points={`${arrowLen},-6 ${arrowLen + 10},0 ${arrowLen},6`} fill="oklch(0.72 0.2 280)" />
                 </g>
+
                 {/* labels */}
                 <text x={W - padX - 8} y={H - padY - 6} textAnchor="end" fontSize="11" fill="oklch(0.6 0.02 260)">Range: {physics.range.toFixed(1)} m</text>
                 <text x={padX + 6} y={padY + 12} fontSize="11" fill="oklch(0.6 0.02 260)">Peak: {physics.maxH.toFixed(1)} m</text>
