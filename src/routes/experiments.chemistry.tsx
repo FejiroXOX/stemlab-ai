@@ -32,20 +32,22 @@ const REAGENTS: { id: Reagent; name: string; color: string }[] = [
   { id: "Water", name: "Water (H₂O)", color: "oklch(0.92 0.03 220)" },
 ];
 
+type Effect = "fizz" | "color" | "heat" | "precipitate" | "smoke" | "none";
+
 type ReactionKey = string;
 const REACTIONS: Record<ReactionKey, {
   label: string;
   products: string;
   observation: string;
   safety: string;
-  effect: "fizz" | "color" | "heat" | "none";
+  effect: Effect;
   resultColor: string;
 }> = {
   "HCl+NaOH": {
     label: "Neutralization: HCl + NaOH",
     products: "NaCl + H₂O",
     observation: "Solution warms; pH approaches 7. No visible gas.",
-    safety: "Both reagents corrosive — wear gloves and goggles.",
+    safety: "Both reagents are corrosive — wear gloves and goggles.",
     effect: "heat",
     resultColor: "oklch(0.92 0.03 220)",
   },
@@ -57,6 +59,14 @@ const REACTIONS: Record<ReactionKey, {
     effect: "fizz",
     resultColor: "oklch(0.95 0.02 100)",
   },
+  "HCl+BakingSoda": {
+    label: "Acid–Carbonate: HCl + Baking Soda",
+    products: "NaCl + CO₂ ↑ + H₂O",
+    observation: "Rapid fizzing; CO₂ released almost instantly.",
+    safety: "HCl is corrosive — handle in a fume hood.",
+    effect: "fizz",
+    resultColor: "oklch(0.93 0.02 220)",
+  },
   "CuSO4+Iron": {
     label: "Single Displacement: CuSO₄ + Fe",
     products: "FeSO₄ + Cu (reddish coating on iron)",
@@ -65,18 +75,64 @@ const REACTIONS: Record<ReactionKey, {
     effect: "color",
     resultColor: "oklch(0.55 0.18 40)",
   },
+  "HCl+Iron": {
+    label: "Acid + Metal: HCl + Fe",
+    products: "FeCl₂ + H₂ ↑",
+    observation: "Iron dissolves slowly; hydrogen gas bubbles up.",
+    safety: "Hydrogen is flammable — keep flames away.",
+    effect: "fizz",
+    resultColor: "oklch(0.7 0.12 140)",
+  },
+  "HCl+Water": {
+    label: "Dilution: HCl + H₂O",
+    products: "Dilute HCl (exothermic mixing)",
+    observation: "Solution warms noticeably as acid disperses. No reaction products.",
+    safety: "ALWAYS add acid to water — never water to acid (splash hazard).",
+    effect: "heat",
+    resultColor: "oklch(0.9 0.04 220)",
+  },
+  "NaOH+Water": {
+    label: "Dissolution: NaOH + H₂O",
+    products: "Strongly basic solution (exothermic)",
+    observation: "Pellets dissolve; solution becomes hot.",
+    safety: "Very caustic — wear goggles and gloves.",
+    effect: "heat",
+    resultColor: "oklch(0.92 0.04 200)",
+  },
+  "CuSO4+NaOH": {
+    label: "Precipitation: CuSO₄ + 2 NaOH",
+    products: "Cu(OH)₂ ↓ (blue precipitate) + Na₂SO₄",
+    observation: "A gelatinous blue precipitate of copper hydroxide forms instantly.",
+    safety: "Avoid skin contact; copper salts are toxic.",
+    effect: "precipitate",
+    resultColor: "oklch(0.55 0.18 235)",
+  },
+  "Vinegar+Iron": {
+    label: "Slow Oxidation: Vinegar + Fe",
+    products: "Iron acetate + trace H₂",
+    observation: "Iron slowly tarnishes over minutes; very mild bubbling.",
+    safety: "Safe in small amounts — but avoid inhaling vapors.",
+    effect: "color",
+    resultColor: "oklch(0.6 0.08 50)",
+  },
 };
 
 function key(a: Reagent, b: Reagent): ReactionKey {
   const sorted = [a, b].sort();
-  // map known pairs
   const m: Record<string, ReactionKey> = {
     "HCl|NaOH": "HCl+NaOH",
     "BakingSoda|Vinegar": "Vinegar+BakingSoda",
+    "BakingSoda|HCl": "HCl+BakingSoda",
     "CuSO4|Iron": "CuSO4+Iron",
+    "HCl|Iron": "HCl+Iron",
+    "HCl|Water": "HCl+Water",
+    "NaOH|Water": "NaOH+Water",
+    "CuSO4|NaOH": "CuSO4+NaOH",
+    "Iron|Vinegar": "Vinegar+Iron",
   };
   return m[sorted.join("|")] ?? "";
 }
+
 
 function ChemistryLab() {
   const [a, setA] = useState<Reagent>("Vinegar");
