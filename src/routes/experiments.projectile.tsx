@@ -60,12 +60,19 @@ function ProjectileLab() {
   const launch = () => { setT(0); setPlaying(true); };
   const reset = () => { setT(0); setPlaying(false); };
 
-  // Plot dims
-  const W = 760, H = 280, padX = 40, padY = 20;
-  const xMax = Math.max(physics.range, 10);
-  const yMax = Math.max(physics.maxH, 5);
-  const sx = (x: number) => padX + (x / xMax) * (W - padX * 2);
-  const sy = (y: number) => H - padY - (y / yMax) * (H - padY * 2);
+  // Plot dims — use a single uniform scale so the angle visually matches reality.
+  const W = 760, H = 320, padX = 44, padY = 24;
+  const plotW = W - padX * 2;
+  const plotH = H - padY * 2;
+  // World extent: include some headroom so trajectory always fits.
+  const worldX = Math.max(physics.range * 1.05, 10);
+  const worldY = Math.max(physics.maxH * 1.15, 5);
+  // Uniform scale (m -> px): the smaller of the two ratios so both fit.
+  const scale = Math.min(plotW / worldX, plotH / worldY);
+  const originX = padX;
+  const originY = H - padY;
+  const sx = (x: number) => originX + x * scale;
+  const sy = (y: number) => originY - y * scale;
 
   // Sample trajectory path
   const path = useMemo(() => {
@@ -79,11 +86,15 @@ function ProjectileLab() {
     }
     return `M ${pts.join(" L ")}`;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [physics, gravity]);
+  }, [physics, gravity, scale]);
 
   // Current ball position
   const cx = sx(physics.vx * t);
   const cy = sy(Math.max(0, physics.vy * t - 0.5 * gravity * t * t));
+
+  // Launch arrow length — fixed pixel length, rotated by true angle.
+  const arrowLen = 56;
+
 
   return (
     <AppShell>
