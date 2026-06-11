@@ -216,16 +216,19 @@ function ChemistryLab() {
             </div>
           ) : mixed !== null ? (
             <div className="glass rounded-2xl p-5 text-sm text-muted-foreground">
-              No notable reaction with this pair. Try <b>Vinegar + Baking Soda</b>, <b>HCl + NaOH</b>, <b>CuSO₄ + NaOH</b>, <b>HCl + Iron</b>, or <b>HCl + Water</b>.
+              No pre-modeled reaction for <b>{a} + {b}</b>. Tap <b>Explain with AI</b> below for a real chemistry prediction, or try classics like <b>Vinegar + Baking Soda</b> or <b>CuSO₄ + NaOH</b>.
             </div>
           ) : null}
 
 
-          {mixed && reaction && (
+          {mixed && (
             <ExplainWhatHappened
+              key={`${a}-${b}-${mixed}`}
               experiment="Chemical Reaction"
-              setup={`${a} mixed with ${b}`}
-              result={`Products: ${reaction.products}. Observation: ${reaction.observation}.`}
+              setup={`A student mixed ${reagentA.name} with ${reagentB.name} in a beaker at room temperature.`}
+              result={reaction
+                ? `Products: ${reaction.products}. Observation: ${reaction.observation}.`
+                : `Predict whether a chemical reaction occurs between ${reagentA.name} and ${reagentB.name}. If yes, give the balanced products, expected observation, and safety notes. If not, explain why no notable reaction occurs.`}
             />
           )}
         </div>

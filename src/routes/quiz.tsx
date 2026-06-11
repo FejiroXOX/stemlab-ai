@@ -184,8 +184,8 @@ function QuizPage() {
           })}
 
           {!submitted && (
-            <Button size="lg" className="w-full glow" onClick={submit} disabled={Object.keys(answers).length < quiz.questions.length}>
-              Submit Quiz
+            <Button size="lg" className="w-full glow" onClick={submit}>
+              Submit Quiz {Object.keys(answers).length < quiz.questions.length && `(${quiz.questions.length - Object.keys(answers).length} unanswered)`}
             </Button>
           )}
         </div>
