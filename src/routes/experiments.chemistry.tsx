@@ -261,48 +261,105 @@ function ReagentPicker({ label, value, onChange }: { label: string; value: Reage
   );
 }
 
-function Flask({ color, label, effect, resultColor }: { color: string; label: string; effect?: "fizz" | "color" | "heat" | "none"; resultColor?: string }) {
-  const liquid = effect === "color" && resultColor ? resultColor : color;
+function Flask({ color, label, effect, resultColor }: { color: string; label: string; effect?: Effect; resultColor?: string }) {
+  const liquid =
+    effect === "color" || effect === "precipitate" ? (resultColor ?? color) : color;
   return (
     <div className="relative grid h-full place-items-end">
-      <div className="relative h-44 w-28">
-        {/* Bubbles */}
+      <div className="relative h-52 w-32">
+        {/* Smoke / vapor */}
+        {effect === "smoke" && (
+          <div className="pointer-events-none absolute inset-x-0 -top-4 z-10 flex justify-center">
+            <div className="h-10 w-16 rounded-full bg-white/20 blur-xl animate-pulse" />
+          </div>
+        )}
+        {/* Rising bubbles for fizz */}
         {effect === "fizz" && (
-          <div className="pointer-events-none absolute inset-x-0 top-2 z-10 grid grid-cols-3 place-items-center">
-            {[0, 1, 2, 3, 4].map((i) => (
+          <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+            {Array.from({ length: 9 }).map((_, i) => (
               <span
                 key={i}
-                className="absolute rounded-full bg-white/70"
+                className="absolute rounded-full bg-white/80 shadow"
                 style={{
-                  width: 8 + (i % 3) * 3,
-                  height: 8 + (i % 3) * 3,
-                  left: 8 + i * 14,
-                  animation: `bubble ${1.2 + (i % 3) * 0.3}s ${i * 0.18}s ease-in infinite`,
+                  width: 6 + (i % 4) * 3,
+                  height: 6 + (i % 4) * 3,
+                  left: `${15 + (i * 9) % 70}%`,
+                  bottom: 8,
+                  animation: `bubble ${1.1 + (i % 4) * 0.25}s ${i * 0.13}s ease-in infinite`,
                 }}
               />
             ))}
           </div>
         )}
-        {/* Flask shape */}
-        <div className="absolute inset-x-9 top-0 h-6 rounded-t-md border border-border bg-background/40" />
-        <div className="absolute inset-x-3 top-6 bottom-0 overflow-hidden rounded-b-3xl rounded-t-md border border-border bg-background/30">
-          <div
-            className="absolute inset-x-0 bottom-0 transition-all"
-            style={{
-              height: "60%",
-              background: liquid,
-              boxShadow: effect === "heat" ? "inset 0 0 30px oklch(0.7 0.2 30 / 0.4)" : undefined,
-            }}
-          />
-          {effect === "heat" && (
-            <div className="absolute inset-0 animate-pulse" style={{ background: "radial-gradient(circle at 50% 90%, oklch(0.8 0.2 30 / 0.3), transparent 60%)" }} />
-          )}
-        </div>
+        {/* Heat shimmer */}
+        {effect === "heat" && (
+          <div className="pointer-events-none absolute -top-3 left-1/2 z-10 -translate-x-1/2">
+            <div className="h-6 w-10 rounded-full bg-orange-400/40 blur-md animate-pulse" />
+          </div>
+        )}
+        {/* Flask neck */}
+        <div className="absolute left-1/2 top-0 h-8 w-8 -translate-x-1/2 rounded-t-md border border-white/30 bg-white/5 backdrop-blur-sm" />
+        {/* Flask shoulders + body using SVG for an Erlenmeyer shape */}
+        <svg viewBox="0 0 100 140" className="absolute inset-x-0 top-7 h-44 w-full drop-shadow-lg">
+          <defs>
+            <linearGradient id={`glass-${label}`} x1="0" x2="1">
+              <stop offset="0" stopColor="rgba(255,255,255,0.25)" />
+              <stop offset="0.5" stopColor="rgba(255,255,255,0.05)" />
+              <stop offset="1" stopColor="rgba(255,255,255,0.18)" />
+            </linearGradient>
+            <clipPath id={`clip-${label}`}>
+              <path d="M35,0 L65,0 L95,120 Q95,135 80,135 L20,135 Q5,135 5,120 Z" />
+            </clipPath>
+          </defs>
+          {/* Liquid fill */}
+          <g clipPath={`url(#clip-${label})`}>
+            <rect x="0" y="55" width="100" height="85" fill={liquid} />
+            {/* Precipitate layer at bottom */}
+            {effect === "precipitate" && (
+              <>
+                <rect x="0" y="110" width="100" height="30" fill={resultColor ?? liquid} opacity="0.95" />
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <circle
+                    key={i}
+                    cx={10 + (i * 7) % 80}
+                    cy={70 + (i * 11) % 40}
+                    r={2 + (i % 3)}
+                    fill={resultColor ?? "#fff"}
+                    opacity="0.7"
+                  >
+                    <animate attributeName="cy" from="60" to="115" dur={`${1.2 + (i % 4) * 0.3}s`} begin={`${i * 0.15}s`} repeatCount="indefinite" />
+                  </circle>
+                ))}
+              </>
+            )}
+            {/* Color-change swirl */}
+            {effect === "color" && (
+              <rect x="0" y="55" width="100" height="85" fill={resultColor ?? liquid} opacity="0.9">
+                <animate attributeName="opacity" values="0;1" dur="1.6s" fill="freeze" />
+              </rect>
+            )}
+            {/* Heat glow */}
+            {effect === "heat" && (
+              <rect x="0" y="55" width="100" height="85" fill="url(#heat-glow)" />
+            )}
+            <radialGradient id="heat-glow" cx="0.5" cy="1">
+              <stop offset="0" stopColor="oklch(0.85 0.2 30 / 0.55)" />
+              <stop offset="1" stopColor="transparent" />
+            </radialGradient>
+          </g>
+          {/* Glass outline */}
+          <path d="M35,0 L65,0 L95,120 Q95,135 80,135 L20,135 Q5,135 5,120 Z" fill={`url(#glass-${label})`} stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" />
+          {/* Measurement marks */}
+          {[40, 65, 90, 115].map((y) => (
+            <line key={y} x1="12" y1={y} x2="22" y2={y} stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+          ))}
+        </svg>
       </div>
-      <div className="mt-2 max-w-[110px] truncate text-center text-[11px] text-muted-foreground">{label}</div>
+      <div className="mt-2 max-w-[120px] truncate text-center text-[11px] font-medium text-muted-foreground">{label}</div>
     </div>
   );
 }
+
 
 function InfoCard({ title, children, tone, icon }: { title: string; children: React.ReactNode; tone?: "primary" | "warn"; icon?: React.ReactNode }) {
   const ring = tone === "primary" ? "border-primary/40" : tone === "warn" ? "border-[color:var(--engineering)]/40" : "";
