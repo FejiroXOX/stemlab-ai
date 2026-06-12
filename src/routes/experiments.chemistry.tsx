@@ -20,7 +20,9 @@ export const Route = createFileRoute("/experiments/chemistry")({
   component: ChemistryLab,
 });
 
-type Reagent = "HCl" | "NaOH" | "Vinegar" | "BakingSoda" | "CuSO4" | "Iron" | "Water";
+type Reagent =
+  | "HCl" | "NaOH" | "Vinegar" | "BakingSoda" | "CuSO4" | "Iron" | "Water"
+  | "AgNO3" | "NaCl" | "KI" | "Zn" | "Mg" | "H2O2" | "KMnO4" | "Sugar" | "Phenolphthalein";
 
 const REAGENTS: { id: Reagent; name: string; color: string }[] = [
   { id: "HCl", name: "Hydrochloric Acid (HCl)", color: "oklch(0.85 0.1 90)" },
@@ -30,6 +32,15 @@ const REAGENTS: { id: Reagent; name: string; color: string }[] = [
   { id: "CuSO4", name: "Copper Sulfate (CuSO₄)", color: "oklch(0.65 0.2 230)" },
   { id: "Iron", name: "Iron Filings (Fe)", color: "oklch(0.55 0.05 60)" },
   { id: "Water", name: "Water (H₂O)", color: "oklch(0.92 0.03 220)" },
+  { id: "AgNO3", name: "Silver Nitrate (AgNO₃)", color: "oklch(0.95 0.02 250)" },
+  { id: "NaCl", name: "Salt (NaCl)", color: "oklch(0.97 0.01 220)" },
+  { id: "KI", name: "Potassium Iodide (KI)", color: "oklch(0.93 0.03 90)" },
+  { id: "Zn", name: "Zinc (Zn)", color: "oklch(0.7 0.02 250)" },
+  { id: "Mg", name: "Magnesium (Mg)", color: "oklch(0.85 0.02 250)" },
+  { id: "H2O2", name: "Hydrogen Peroxide (H₂O₂)", color: "oklch(0.94 0.02 220)" },
+  { id: "KMnO4", name: "Potassium Permanganate (KMnO₄)", color: "oklch(0.45 0.2 320)" },
+  { id: "Sugar", name: "Sugar (C₁₂H₂₂O₁₁)", color: "oklch(0.97 0.01 90)" },
+  { id: "Phenolphthalein", name: "Phenolphthalein (indicator)", color: "oklch(0.97 0.01 320)" },
 ];
 
 type Effect = "fizz" | "color" | "heat" | "precipitate" | "smoke" | "none";
@@ -43,78 +54,30 @@ const REACTIONS: Record<ReactionKey, {
   effect: Effect;
   resultColor: string;
 }> = {
-  "HCl+NaOH": {
-    label: "Neutralization: HCl + NaOH",
-    products: "NaCl + H₂O",
-    observation: "Solution warms; pH approaches 7. No visible gas.",
-    safety: "Both reagents are corrosive — wear gloves and goggles.",
-    effect: "heat",
-    resultColor: "oklch(0.92 0.03 220)",
-  },
-  "Vinegar+BakingSoda": {
-    label: "Acid–Carbonate: Vinegar + Baking Soda",
-    products: "Sodium acetate + CO₂ ↑ + H₂O",
-    observation: "Vigorous bubbling as CO₂ gas escapes.",
-    safety: "Mild — but never seal the container, gas pressure builds.",
-    effect: "fizz",
-    resultColor: "oklch(0.95 0.02 100)",
-  },
-  "HCl+BakingSoda": {
-    label: "Acid–Carbonate: HCl + Baking Soda",
-    products: "NaCl + CO₂ ↑ + H₂O",
-    observation: "Rapid fizzing; CO₂ released almost instantly.",
-    safety: "HCl is corrosive — handle in a fume hood.",
-    effect: "fizz",
-    resultColor: "oklch(0.93 0.02 220)",
-  },
-  "CuSO4+Iron": {
-    label: "Single Displacement: CuSO₄ + Fe",
-    products: "FeSO₄ + Cu (reddish coating on iron)",
-    observation: "Blue solution fades; iron darkens with copper deposit.",
-    safety: "Copper sulfate is toxic if ingested. Wash hands.",
-    effect: "color",
-    resultColor: "oklch(0.55 0.18 40)",
-  },
-  "HCl+Iron": {
-    label: "Acid + Metal: HCl + Fe",
-    products: "FeCl₂ + H₂ ↑",
-    observation: "Iron dissolves slowly; hydrogen gas bubbles up.",
-    safety: "Hydrogen is flammable — keep flames away.",
-    effect: "fizz",
-    resultColor: "oklch(0.7 0.12 140)",
-  },
-  "HCl+Water": {
-    label: "Dilution: HCl + H₂O",
-    products: "Dilute HCl (exothermic mixing)",
-    observation: "Solution warms noticeably as acid disperses. No reaction products.",
-    safety: "ALWAYS add acid to water — never water to acid (splash hazard).",
-    effect: "heat",
-    resultColor: "oklch(0.9 0.04 220)",
-  },
-  "NaOH+Water": {
-    label: "Dissolution: NaOH + H₂O",
-    products: "Strongly basic solution (exothermic)",
-    observation: "Pellets dissolve; solution becomes hot.",
-    safety: "Very caustic — wear goggles and gloves.",
-    effect: "heat",
-    resultColor: "oklch(0.92 0.04 200)",
-  },
-  "CuSO4+NaOH": {
-    label: "Precipitation: CuSO₄ + 2 NaOH",
-    products: "Cu(OH)₂ ↓ (blue precipitate) + Na₂SO₄",
-    observation: "A gelatinous blue precipitate of copper hydroxide forms instantly.",
-    safety: "Avoid skin contact; copper salts are toxic.",
-    effect: "precipitate",
-    resultColor: "oklch(0.55 0.18 235)",
-  },
-  "Vinegar+Iron": {
-    label: "Slow Oxidation: Vinegar + Fe",
-    products: "Iron acetate + trace H₂",
-    observation: "Iron slowly tarnishes over minutes; very mild bubbling.",
-    safety: "Safe in small amounts — but avoid inhaling vapors.",
-    effect: "color",
-    resultColor: "oklch(0.6 0.08 50)",
-  },
+  "HCl+NaOH": { label: "Neutralization: HCl + NaOH", products: "NaCl + H₂O", observation: "Solution warms; pH approaches 7. No visible gas.", safety: "Both reagents are corrosive — wear gloves and goggles.", effect: "heat", resultColor: "oklch(0.92 0.03 220)" },
+  "Vinegar+BakingSoda": { label: "Acid–Carbonate: Vinegar + Baking Soda", products: "Sodium acetate + CO₂ ↑ + H₂O", observation: "Vigorous bubbling as CO₂ gas escapes.", safety: "Mild — but never seal the container, gas pressure builds.", effect: "fizz", resultColor: "oklch(0.95 0.02 100)" },
+  "HCl+BakingSoda": { label: "Acid–Carbonate: HCl + Baking Soda", products: "NaCl + CO₂ ↑ + H₂O", observation: "Rapid fizzing; CO₂ released almost instantly.", safety: "HCl is corrosive — handle in a fume hood.", effect: "fizz", resultColor: "oklch(0.93 0.02 220)" },
+  "CuSO4+Iron": { label: "Single Displacement: CuSO₄ + Fe", products: "FeSO₄ + Cu (reddish coating on iron)", observation: "Blue solution fades; iron darkens with copper deposit.", safety: "Copper sulfate is toxic if ingested. Wash hands.", effect: "color", resultColor: "oklch(0.55 0.18 40)" },
+  "HCl+Iron": { label: "Acid + Metal: HCl + Fe", products: "FeCl₂ + H₂ ↑", observation: "Iron dissolves slowly; hydrogen gas bubbles up.", safety: "Hydrogen is flammable — keep flames away.", effect: "fizz", resultColor: "oklch(0.7 0.12 140)" },
+  "HCl+Water": { label: "Dilution: HCl + H₂O", products: "Dilute HCl (exothermic mixing)", observation: "Solution warms noticeably as acid disperses.", safety: "ALWAYS add acid to water — never water to acid.", effect: "heat", resultColor: "oklch(0.9 0.04 220)" },
+  "NaOH+Water": { label: "Dissolution: NaOH + H₂O", products: "Strongly basic solution (exothermic)", observation: "Pellets dissolve; solution becomes hot.", safety: "Very caustic — wear goggles and gloves.", effect: "heat", resultColor: "oklch(0.92 0.04 200)" },
+  "CuSO4+NaOH": { label: "Precipitation: CuSO₄ + 2 NaOH", products: "Cu(OH)₂ ↓ + Na₂SO₄", observation: "A gelatinous blue precipitate of copper hydroxide forms instantly.", safety: "Avoid skin contact; copper salts are toxic.", effect: "precipitate", resultColor: "oklch(0.55 0.18 235)" },
+  "Vinegar+Iron": { label: "Slow Oxidation: Vinegar + Fe", products: "Iron acetate + trace H₂", observation: "Iron slowly tarnishes; very mild bubbling.", safety: "Safe in small amounts.", effect: "color", resultColor: "oklch(0.6 0.08 50)" },
+  "AgNO3+NaCl": { label: "Precipitation: AgNO₃ + NaCl", products: "AgCl ↓ + NaNO₃", observation: "A milky white precipitate of silver chloride forms instantly.", safety: "Silver nitrate stains skin black — wear gloves.", effect: "precipitate", resultColor: "oklch(0.95 0.005 220)" },
+  "AgNO3+KI": { label: "Precipitation: AgNO₃ + KI", products: "AgI ↓ + KNO₃", observation: "A bright yellow precipitate of silver iodide drops out of solution.", safety: "Silver nitrate is corrosive and stains.", effect: "precipitate", resultColor: "oklch(0.88 0.16 95)" },
+  "HCl+Zn": { label: "Acid + Metal: HCl + Zn", products: "ZnCl₂ + H₂ ↑", observation: "Vigorous fizzing as hydrogen gas evolves; zinc dissolves.", safety: "Hydrogen is flammable; HCl is corrosive.", effect: "fizz", resultColor: "oklch(0.9 0.03 220)" },
+  "HCl+Mg": { label: "Acid + Metal: HCl + Mg", products: "MgCl₂ + H₂ ↑", observation: "Very vigorous bubbling; reaction is highly exothermic.", safety: "Strongly exothermic — small amounts only.", effect: "fizz", resultColor: "oklch(0.92 0.03 220)" },
+  "Vinegar+Zn": { label: "Weak Acid + Metal: Vinegar + Zn", products: "Zinc acetate + H₂ ↑", observation: "Slow steady bubbling as zinc reacts with acetic acid.", safety: "Mild; ventilate the area.", effect: "fizz", resultColor: "oklch(0.9 0.03 220)" },
+  "H2O2+KI": { label: "Catalytic Decomposition: H₂O₂ + KI", products: "2 H₂O + O₂ ↑ (KI catalyst)", observation: "Rapid foaming as oxygen gas is released — the 'elephant toothpaste' demo.", safety: "Use dilute peroxide.", effect: "fizz", resultColor: "oklch(0.95 0.02 90)" },
+  "H2O2+KMnO4": { label: "Redox: H₂O₂ + KMnO₄", products: "Mn²⁺ + O₂ ↑ + H₂O", observation: "Purple color fades as oxygen bubbles vigorously.", safety: "KMnO₄ stains; reaction is exothermic.", effect: "fizz", resultColor: "oklch(0.9 0.03 220)" },
+  "KMnO4+Water": { label: "Dissolution: KMnO₄ + H₂O", products: "Intense purple solution", observation: "Crystals dissolve to give a deep purple solution.", safety: "KMnO₄ is a strong oxidizer and stains skin.", effect: "color", resultColor: "oklch(0.4 0.2 320)" },
+  "NaCl+Water": { label: "Dissolution: NaCl + H₂O", products: "Saline solution", observation: "Salt dissolves; solution stays clear.", safety: "Completely safe.", effect: "color", resultColor: "oklch(0.95 0.01 220)" },
+  "Sugar+Water": { label: "Dissolution: Sugar + H₂O", products: "Sugar syrup", observation: "Sugar dissolves to give a clear sweet solution.", safety: "Safe.", effect: "color", resultColor: "oklch(0.96 0.015 90)" },
+  "NaOH+Phenolphthalein": { label: "Indicator: NaOH + Phenolphthalein", products: "Bright pink complex", observation: "Solution turns bright pink — indicates a basic pH.", safety: "NaOH is caustic.", effect: "color", resultColor: "oklch(0.78 0.15 350)" },
+  "HCl+Phenolphthalein": { label: "Indicator: HCl + Phenolphthalein", products: "Colorless (acidic)", observation: "Indicator stays colorless — confirms an acidic pH.", safety: "HCl is corrosive.", effect: "color", resultColor: "oklch(0.95 0.01 220)" },
+  "Vinegar+Phenolphthalein": { label: "Indicator: Vinegar + Phenolphthalein", products: "Colorless (weak acid)", observation: "Stays colorless — vinegar is acidic.", safety: "Safe.", effect: "color", resultColor: "oklch(0.95 0.01 220)" },
+  "BakingSoda+Phenolphthalein": { label: "Indicator: NaHCO₃ + Phenolphthalein", products: "Faint pink (weakly basic)", observation: "Solution turns faintly pink — baking soda is mildly basic.", safety: "Safe.", effect: "color", resultColor: "oklch(0.9 0.06 350)" },
+  "CuSO4+Water": { label: "Dissolution: CuSO₄ + H₂O", products: "Blue copper sulfate solution", observation: "Crystals dissolve to give a clear blue solution.", safety: "Toxic if ingested.", effect: "color", resultColor: "oklch(0.65 0.2 230)" },
 };
 
 function key(a: Reagent, b: Reagent): ReactionKey {
@@ -129,6 +92,21 @@ function key(a: Reagent, b: Reagent): ReactionKey {
     "NaOH|Water": "NaOH+Water",
     "CuSO4|NaOH": "CuSO4+NaOH",
     "Iron|Vinegar": "Vinegar+Iron",
+    "AgNO3|NaCl": "AgNO3+NaCl",
+    "AgNO3|KI": "AgNO3+KI",
+    "HCl|Zn": "HCl+Zn",
+    "HCl|Mg": "HCl+Mg",
+    "Vinegar|Zn": "Vinegar+Zn",
+    "H2O2|KI": "H2O2+KI",
+    "H2O2|KMnO4": "H2O2+KMnO4",
+    "KMnO4|Water": "KMnO4+Water",
+    "NaCl|Water": "NaCl+Water",
+    "Sugar|Water": "Sugar+Water",
+    "NaOH|Phenolphthalein": "NaOH+Phenolphthalein",
+    "HCl|Phenolphthalein": "HCl+Phenolphthalein",
+    "Phenolphthalein|Vinegar": "Vinegar+Phenolphthalein",
+    "BakingSoda|Phenolphthalein": "BakingSoda+Phenolphthalein",
+    "CuSO4|Water": "CuSO4+Water",
   };
   return m[sorted.join("|")] ?? "";
 }
