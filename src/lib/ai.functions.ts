@@ -107,7 +107,7 @@ Respond with ONLY a valid JSON object matching this exact shape:
 }`,
     });
 
-    return ExplainOutput.parse(extractJson(text));
+    return sanitize(ExplainOutput.parse(extractJson(text)));
   });
 
 const QuizInput = z.object({
