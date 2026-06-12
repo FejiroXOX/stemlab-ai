@@ -33,7 +33,11 @@ function QuizPage() {
     setLoading(true); setErr(null); setQuiz(null); setAnswers({}); setSubmitted(false);
     try {
       const q = await gen({ data: { topic, count: 5 } });
-      setQuiz(q);
+      if ("error" in q) {
+        setErr(q.error);
+      } else {
+        setQuiz(q);
+      }
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Quiz generation failed");
     } finally { setLoading(false); }
