@@ -131,11 +131,14 @@ function QuizPage() {
                           key={opt}
                           disabled={submitted}
                           onClick={() => setAnswers({ ...answers, [i]: opt })}
-                          className={cn("glass rounded-xl px-3 py-2 text-left text-sm transition",
-                            selected && !submitted && "border-primary bg-primary/15",
+                          className={cn("glass rounded-xl border-2 border-transparent px-3 py-2 text-left text-sm transition",
+                            selected && !submitted && "border-primary bg-primary/25 ring-2 ring-primary/40 font-semibold shadow-md",
                             submitted && isAnswer && "border-[color:var(--science)] bg-[color:var(--science)]/15",
                             submitted && selected && !isAnswer && "border-destructive bg-destructive/15")}
-                        >{opt}</button>
+                        >
+                          <span className="mr-2 inline-block w-4">{selected ? "●" : "○"}</span>
+                          {opt}
+                        </button>
                       );
                     })}
                   </div>
@@ -151,8 +154,8 @@ function QuizPage() {
                           key={opt}
                           disabled={submitted}
                           onClick={() => setAnswers({ ...answers, [i]: opt })}
-                          className={cn("glass flex-1 rounded-xl px-3 py-2 text-sm",
-                            selected && !submitted && "border-primary bg-primary/15",
+                          className={cn("glass flex-1 rounded-xl border-2 border-transparent px-3 py-2 text-sm",
+                            selected && !submitted && "border-primary bg-primary/25 ring-2 ring-primary/40 font-semibold shadow-md",
                             submitted && isAnswer && "border-[color:var(--science)] bg-[color:var(--science)]/15",
                             submitted && selected && !isAnswer && "border-destructive bg-destructive/15")}
                         >{opt}</button>
