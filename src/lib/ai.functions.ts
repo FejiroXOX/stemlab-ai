@@ -122,7 +122,7 @@ Respond with ONLY a valid JSON object (no markdown, no code fences). Either the 
 
     const parsed = extractJson(text) as { error?: string };
     if (parsed && typeof parsed.error === "string") {
-      throw new Error(parsed.error);
+      return { error: parsed.error } as { error: string };
     }
     return QuizOutput.parse(parsed);
   });
