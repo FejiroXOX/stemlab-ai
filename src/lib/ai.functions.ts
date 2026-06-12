@@ -164,6 +164,6 @@ Respond with ONLY a valid JSON object (no markdown, no code fences). Either the 
     if (parsed && typeof parsed.error === "string") {
       return { error: parsed.error } as { error: string };
     }
-    return QuizOutput.parse(parsed);
+    return sanitize(QuizOutput.parse(parsed));
   });
 
