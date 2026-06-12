@@ -24,6 +24,40 @@ function extractJson(text: string): unknown {
   }
 }
 
+const SUB = { "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅","6":"₆","7":"₇","8":"₈","9":"₉" } as Record<string,string>;
+const SUP = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","+":"⁺","-":"⁻" } as Record<string,string>;
+
+function stripLatex(s: string): string {
+  let out = s;
+  // \text{x} -> x, \mathrm{x} -> x
+  out = out.replace(/\\(?:text|mathrm|mathit|mathbf)\{([^}]*)\}/g, "$1");
+  // \rightarrow / \to
+  out = out.replace(/\\(?:rightarrow|to|longrightarrow)/g, "→");
+  out = out.replace(/\\leftarrow/g, "←");
+  out = out.replace(/\\times/g, "×").replace(/\\cdot/g, "·").replace(/\\pm/g, "±").replace(/\\degree/g, "°");
+  // Subscripts: _2 or _{12}
+  out = out.replace(/_\{([^}]+)\}/g, (_, g) => g.replace(/[0-9]/g, (c: string) => SUB[c] ?? c));
+  out = out.replace(/_([0-9])/g, (_, c) => SUB[c] ?? c);
+  // Superscripts: ^+ ^{2+}
+  out = out.replace(/\^\{([^}]+)\}/g, (_, g) => g.replace(/[0-9+\-]/g, (c: string) => SUP[c] ?? c));
+  out = out.replace(/\^([0-9+\-])/g, (_, c) => SUP[c] ?? c);
+  // Drop $...$ and \( \) \[ \]
+  out = out.replace(/\$+/g, "");
+  out = out.replace(/\\[()[\]]/g, "");
+  return out;
+}
+
+function sanitize<T>(v: T): T {
+  if (typeof v === "string") return stripLatex(v) as unknown as T;
+  if (Array.isArray(v)) return v.map(sanitize) as unknown as T;
+  if (v && typeof v === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, val] of Object.entries(v)) out[k] = sanitize(val);
+    return out as unknown as T;
+  }
+  return v;
+}
+
 const ExplainInput = z.object({
   experiment: z.string(),
   setup: z.string(),
@@ -55,7 +89,13 @@ Experiment: ${data.experiment}
 Setup: ${data.setup}
 Result: ${data.result}
 
-Respond with ONLY a valid JSON object (no markdown, no code fences) matching this exact shape:
+Formatting rules for ALL string fields:
+- Write chemical formulas with Unicode subscripts/superscripts (H₂O, CO₂, H₃O⁺, SO₄²⁻, Fe³⁺), not "H2O" or "H_2O".
+- Write math with Unicode (×, ÷, ±, ², ³, ½, π, θ, °, →), not LaTeX.
+- Do NOT use "$", "\\(", "\\)", "\\[", "\\]", "^", "_", or any LaTeX/markdown delimiters.
+- Plain prose only — no markdown, no code fences.
+
+Respond with ONLY a valid JSON object matching this exact shape:
 {
   "headline": "vivid one-line headline",
   "whatHappened": "1-2 sentences describing observable result",
@@ -67,7 +107,7 @@ Respond with ONLY a valid JSON object (no markdown, no code fences) matching thi
 }`,
     });
 
-    return ExplainOutput.parse(extractJson(text));
+    return sanitize(ExplainOutput.parse(extractJson(text)));
   });
 
 const QuizInput = z.object({
@@ -124,6 +164,6 @@ Respond with ONLY a valid JSON object (no markdown, no code fences). Either the 
     if (parsed && typeof parsed.error === "string") {
       return { error: parsed.error } as { error: string };
     }
-    return QuizOutput.parse(parsed);
+    return sanitize(QuizOutput.parse(parsed));
   });
 
