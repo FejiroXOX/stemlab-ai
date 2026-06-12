@@ -97,12 +97,19 @@ export const generateQuiz = createServerFn({ method: "POST" })
 
     const { text } = await generateText({
       model: gateway(MODEL),
-      prompt: `Generate a ${data.count}-question high-school STEM quiz on the topic: "${data.topic}".
+      prompt: `You are a STEM quiz generator. The user requested a quiz on: "${data.topic}".
+
+FIRST: Decide whether "${data.topic}" is a real, recognizable STEM topic (Science, Technology, Engineering, or Math — including subfields like biology, chemistry, physics, computer science, electronics, algebra, calculus, etc.). Random keyboard mashing (e.g. "qwertyuiop", "asdfgh"), gibberish, or non-STEM topics (e.g. "celebrity gossip", "cooking pasta") are NOT valid.
+
+If the topic is NOT a valid STEM topic, respond with ONLY:
+{"error": "\\"${data.topic}\\" is not a recognized STEM topic. Try something like Photosynthesis, Ohm's Law, or Newton's Laws."}
+
+If it IS a valid STEM topic, generate a ${data.count}-question high-school STEM quiz.
 Mix question types: multiple-choice (with 4 options), true/false, and at least one short-answer.
 For mcq: "answer" must exactly match one of "options". For tf: "answer" must be "True" or "False".
 Keep questions clear and concise; include a brief explanation for each.
 
-Respond with ONLY a valid JSON object (no markdown, no code fences) matching this exact shape:
+Respond with ONLY a valid JSON object (no markdown, no code fences). Either the error shape above, or:
 {
   "title": "Quiz title about ${data.topic}",
   "questions": [
@@ -113,5 +120,10 @@ Respond with ONLY a valid JSON object (no markdown, no code fences) matching thi
 }`,
     });
 
-    return QuizOutput.parse(extractJson(text));
+    const parsed = extractJson(text) as { error?: string };
+    if (parsed && typeof parsed.error === "string") {
+      throw new Error(parsed.error);
+    }
+    return QuizOutput.parse(parsed);
   });
+
