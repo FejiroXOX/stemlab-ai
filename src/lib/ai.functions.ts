@@ -55,7 +55,13 @@ Experiment: ${data.experiment}
 Setup: ${data.setup}
 Result: ${data.result}
 
-Respond with ONLY a valid JSON object (no markdown, no code fences) matching this exact shape:
+Formatting rules for ALL string fields:
+- Write chemical formulas with Unicode subscripts/superscripts (H₂O, CO₂, H₃O⁺, SO₄²⁻, Fe³⁺), not "H2O" or "H_2O".
+- Write math with Unicode (×, ÷, ±, ², ³, ½, π, θ, °, →), not LaTeX.
+- Do NOT use "$", "\\(", "\\)", "\\[", "\\]", "^", "_", or any LaTeX/markdown delimiters.
+- Plain prose only — no markdown, no code fences.
+
+Respond with ONLY a valid JSON object matching this exact shape:
 {
   "headline": "vivid one-line headline",
   "whatHappened": "1-2 sentences describing observable result",
