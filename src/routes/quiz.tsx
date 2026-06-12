@@ -15,7 +15,7 @@ export const Route = createFileRoute("/quiz")({
   component: QuizPage,
 });
 
-type Quiz = Awaited<ReturnType<typeof generateQuiz>>;
+type Quiz = Extract<Awaited<ReturnType<typeof generateQuiz>>, { questions: unknown }>;
 
 const TOPICS = ["Acid–Base Reactions", "Ohm's Law", "Projectile Motion", "Photosynthesis", "Newton's Laws"];
 
