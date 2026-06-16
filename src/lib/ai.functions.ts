@@ -149,6 +149,7 @@ const QuizOutput = z.object({
 export const generateQuiz = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => QuizInput.parse(d))
   .handler(async ({ data }) => {
+    assertAllowedOrigin();
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
     const gateway = createLovableAiGatewayProvider(key);
