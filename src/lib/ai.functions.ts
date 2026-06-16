@@ -111,7 +111,7 @@ Respond with ONLY a valid JSON object matching this exact shape:
   });
 
 const QuizInput = z.object({
-  topic: z.string().min(1),
+  topic: z.string().min(1).max(100),
   count: z.number().int().min(3).max(8).default(5),
 });
 
