@@ -59,9 +59,9 @@ function sanitize<T>(v: T): T {
 }
 
 const ExplainInput = z.object({
-  experiment: z.string(),
-  setup: z.string(),
-  result: z.string(),
+  experiment: z.string().min(1).max(200),
+  setup: z.string().min(1).max(500),
+  result: z.string().min(1).max(500),
 });
 
 const ExplainOutput = z.object({
