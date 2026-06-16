@@ -1,9 +1,26 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/start-server-core";
 import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 
 const MODEL = "google/gemini-3-flash-preview";
+
+function assertAllowedOrigin() {
+  const origin = getRequestHeader("origin") ?? getRequestHeader("referer");
+  if (!origin) throw new Error("Forbidden");
+  try {
+    const host = new URL(origin).host;
+    const ok =
+      /\.lovable\.app$/.test(host) ||
+      /\.lovable\.dev$/.test(host) ||
+      host === "localhost" ||
+      host.startsWith("localhost:");
+    if (!ok) throw new Error("Forbidden");
+  } catch {
+    throw new Error("Forbidden");
+  }
+}
 
 function extractJson(text: string): unknown {
   // Strip code fences
@@ -59,9 +76,9 @@ function sanitize<T>(v: T): T {
 }
 
 const ExplainInput = z.object({
-  experiment: z.string(),
-  setup: z.string(),
-  result: z.string(),
+  experiment: z.string().min(1).max(200),
+  setup: z.string().min(1).max(500),
+  result: z.string().min(1).max(500),
 });
 
 const ExplainOutput = z.object({
@@ -77,6 +94,7 @@ const ExplainOutput = z.object({
 export const explainExperiment = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => ExplainInput.parse(d))
   .handler(async ({ data }) => {
+    assertAllowedOrigin();
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
     const gateway = createLovableAiGatewayProvider(key);
@@ -111,7 +129,7 @@ Respond with ONLY a valid JSON object matching this exact shape:
   });
 
 const QuizInput = z.object({
-  topic: z.string().min(1),
+  topic: z.string().min(1).max(100),
   count: z.number().int().min(3).max(8).default(5),
 });
 
@@ -131,6 +149,7 @@ const QuizOutput = z.object({
 export const generateQuiz = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => QuizInput.parse(d))
   .handler(async ({ data }) => {
+    assertAllowedOrigin();
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
     const gateway = createLovableAiGatewayProvider(key);
