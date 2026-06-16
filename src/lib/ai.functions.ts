@@ -1,9 +1,26 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/start-server-core";
 import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 
 const MODEL = "google/gemini-3-flash-preview";
+
+function assertAllowedOrigin() {
+  const origin = getRequestHeader("origin") ?? getRequestHeader("referer");
+  if (!origin) throw new Error("Forbidden");
+  try {
+    const host = new URL(origin).host;
+    const ok =
+      /\.lovable\.app$/.test(host) ||
+      /\.lovable\.dev$/.test(host) ||
+      host === "localhost" ||
+      host.startsWith("localhost:");
+    if (!ok) throw new Error("Forbidden");
+  } catch {
+    throw new Error("Forbidden");
+  }
+}
 
 function extractJson(text: string): unknown {
   // Strip code fences
