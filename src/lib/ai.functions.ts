@@ -94,6 +94,7 @@ const ExplainOutput = z.object({
 export const explainExperiment = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => ExplainInput.parse(d))
   .handler(async ({ data }) => {
+    assertAllowedOrigin();
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
     const gateway = createLovableAiGatewayProvider(key);
